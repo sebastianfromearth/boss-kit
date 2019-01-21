@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "boss-kit.fullname" . }}
+  labels:
+    app: {{ template "boss-kit.name" . }}
+    chart: {{ template "boss-kit.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: {{ template "boss-kit.name" . }}
+    release: {{ .Release.Name }}

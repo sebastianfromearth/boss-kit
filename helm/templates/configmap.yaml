@@ -1,0 +1,18 @@
+{{- if eq .Values.deployment.configMap.enabled "true" }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.deployment.configMap.name }}
+  labels:
+    app: {{ template "boss-kit.name" . }}
+    chart: {{ template "boss-kit.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+  someConfigFile.json: |
+    {
+        "name": "John",
+        "age": 30,
+        "car": null
+    }
+{{- end }}

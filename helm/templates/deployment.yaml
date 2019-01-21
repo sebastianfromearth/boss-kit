@@ -1,0 +1,85 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "boss-kit.fullname" . }}
+  labels:
+    app: {{ template "boss-kit.name" . }}
+    chart: {{ template "boss-kit.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ template "boss-kit.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "boss-kit.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if eq .Values.deployment.configMap.enabled "true" }}
+          volumeMounts:
+          - name: {{ .Values.deployment.configMap.name }}
+            mountPath: {{ .Values.deployment.configMap.mountPath }}
+          {{- end }}
+          {{- if eq .Values.persistentVolume.enabled "true" }}
+          {{- range .Values.persistentVolume.volume }}
+          volumeMounts:
+          - mountPath: {{ .mountPath }}
+            name: {{ .name }}
+          {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+        {{- if eq .Values.deployment.configMap.enabled "true" }}
+        volumes:
+        - name: {{ .Values.deployment.configMap.name }}
+          configMap:
+            name: {{ .Values.deployment.configMap.name }}
+        {{- end }}
+        {{- if eq .Values.persistentVolume.enabled "true" }}
+        {{- range .Values.persistentVolume.volume }}
+        volumes:
+        - name: {{ .name }}
+          persistentVolumeClaim:
+            claimName: {{ .claimName }}
+        {{- end }}
+        {{- end }}
+        imagePullSecrets:
+        - name: {{ .Values.deployment.imagePullSecret }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

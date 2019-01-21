@@ -1,0 +1,29 @@
+{{- if .Values.ingress.enabled -}}
+{{- if .Values.ingress.tls }}
+{{- range .Values.ingress.tls }}
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ .secretName }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  secretName: {{ .secretName }}
+  dnsNames:
+  {{- range .hosts }}
+  - {{ . }}
+  {{- end }}
+  acme:
+    config:
+    - http01:
+        ingressClass: nginx
+      domains:
+      {{- range .hosts }}
+      - {{ . }}
+      {{- end }}
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+{{- end }}
+{{- end }}
+{{- end }}

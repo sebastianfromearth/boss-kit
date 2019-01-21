@@ -1,0 +1,103 @@
+# Default values for boss-kit.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+environment: dev
+
+image:
+  repository: nginx
+  tag: stable
+  pullPolicy: IfNotPresent
+
+deployment:
+  replicaCount: 1
+  revisionHistoryLimit: 10
+  imagePullSecret: pleaseOverrideThisWithSetValue
+  configMap:
+    enabled: false
+    # name: someConfigFile.json
+    # mountPath: /some/directory
+
+persistentVolume:
+  enabled: false
+  volume: []
+  # - name: app-volume
+  #   claimName: app-claim
+  #   mountPath: /app
+  #   storageClassName: app-manual
+  #   storageCapacity: 250Mi
+  #   hostPath: /my/working/directory
+
+hpa:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUUtilizationPercentage: 80
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+  path: /
+  hosts:
+    - chart-example.local
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+nginx-ingress:
+  rbac:
+    create: false
+  controller:
+    replicaCount: 1
+    scope:
+      enabled: true
+    resources:
+      requests:
+        memory: 250Mi
+        cpu: 10m
+      limits:
+        memory: 1000Mi
+        cpu: 50m
+    service:
+      type: NodePort
+      nodePorts:
+        http: 30003
+        https: 30001
+      externalTrafficPolicy: Local
+      healthCheckNodePort: ""
+  defaultBackend:
+    resources:
+      requests:
+        memory: 5Mi
+        cpu: 1m
+      limits:
+        memory: 10Mi
+        cpu: 2m
+    service:
+      type: NodePort
+  revisionHistoryLimit: 2
