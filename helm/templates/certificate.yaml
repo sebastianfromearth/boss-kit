@@ -1,4 +1,4 @@
-{{- if .Values.ingress.enabled -}}
+{{- if eq .Values.ingress.enabled true -}}
 {{- if .Values.ingress.tls }}
 {{- range .Values.ingress.tls }}
 ---

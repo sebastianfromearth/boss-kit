@@ -1,0 +1,12 @@
+{{- if eq .Values.deployment.pdb.enabled true }}
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "boss-kit.fullname" . }}-pdb
+spec:
+  minAvailable: {{ .Values.deployment.pdb.minAvailable }}
+  selector:
+    matchLabels:
+      app: {{ template "boss-kit.fullname" . }}
+{{- end }}

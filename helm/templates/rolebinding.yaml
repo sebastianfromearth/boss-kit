@@ -1,4 +1,5 @@
 # for nginx ingress between prod and dev environments
+{{- if eq .Values.environment "dev" -}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -6,9 +7,10 @@ metadata:
   name: user-default-role-view-all
 subjects:
 - kind: ServiceAccount
-  name: default
+  name: {{ .Release.Name }}-nginx-ingress
   namespace: {{ .Release.Namespace }}
 roleRef:
   kind: ClusterRole
   name: view
   apiGroup: rbac.authorization.k8s.io
+{{- end }}

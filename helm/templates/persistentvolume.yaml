@@ -1,4 +1,4 @@
-{{- if eq .Values.persistentVolume.enabled "true" }}
+{{- if eq .Values.persistentVolume.enabled true }}
 {{- range .Values.persistentVolume.volume }}
 ---
 apiVersion: v1

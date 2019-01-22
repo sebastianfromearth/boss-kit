@@ -1,4 +1,4 @@
-{{- if eq .Values.deployment.configMap.enabled "true" }}
+{{- if eq .Values.deployment.configMap.enabled true }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

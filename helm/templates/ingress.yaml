@@ -1,4 +1,4 @@
-{{- if .Values.ingress.enabled -}}
+{{- if eq .Values.ingress.enabled true -}}
 {{- $fullName := include "boss-kit.fullname" . -}}
 {{- $ingressPath := .Values.ingress.path -}}
 apiVersion: extensions/v1beta1

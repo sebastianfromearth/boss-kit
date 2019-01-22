@@ -5,6 +5,9 @@
 environment: dev
 
 image:
+  privateRepo:
+    enabled: false
+    pullSecret: pleaseOverrideThisWithSetValue
   repository: nginx
   tag: stable
   pullPolicy: IfNotPresent
@@ -12,11 +15,18 @@ image:
 deployment:
   replicaCount: 1
   revisionHistoryLimit: 10
-  imagePullSecret: pleaseOverrideThisWithSetValue
   configMap:
     enabled: false
     # name: someConfigFile.json
     # mountPath: /some/directory
+  hpa:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 2
+    targetCPUUtilizationPercentage: 80
+  pdb:
+    enabled: false
+    minAvailable: 1
 
 persistentVolume:
   enabled: false
@@ -27,12 +37,6 @@ persistentVolume:
   #   storageClassName: app-manual
   #   storageCapacity: 250Mi
   #   hostPath: /my/working/directory
-
-hpa:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 2
-  targetCPUUtilizationPercentage: 80
 
 service:
   type: ClusterIP
@@ -87,7 +91,7 @@ nginx-ingress:
       type: NodePort
       nodePorts:
         http: 30003
-        https: 30001
+        https: 30000
       externalTrafficPolicy: Local
       healthCheckNodePort: ""
   defaultBackend:
